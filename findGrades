@@ -1,0 +1,58 @@
+from functools import reduce
+
+# Function to classify grades based on scores
+def get_grade(score):
+    if score >= 90:
+        return 'A'
+    elif score >= 80:
+        return 'B'
+    elif score >= 70:
+        return 'C'
+    elif score >= 60:
+        return 'D'
+    else:
+        return 'F'
+
+# Function to map student scores to grades
+def mapper(student_data):
+    name, score = student_data
+    return (name, get_grade(score))
+
+# Function to reduce and aggregate grades by student name
+def reducer(grades, student_data):
+    name, grade = student_data
+    if name not in grades:
+        grades[name] = []  # Initialize grades list for the student if not already present
+    grades[name].append(grade)
+    return grades
+
+# List of student data (name, score)
+student_scores = [
+    ('Alice', 85),
+    ('Bob', 70),
+    ('Charlie', 95),
+    ('David', 60),
+    ('Eve', 75)
+]
+
+# Map student scores to grades
+grades_mapped = list(map(mapper, student_scores))
+
+# Reduce and aggregate grades by student name
+grades_reduced = reduce(reducer, grades_mapped, {})
+
+# Function to get grades of a specific student
+def get_student_grades(student_name):
+    if student_name in grades_reduced:
+        return grades_reduced[student_name]
+    else:
+        return "Student not found."
+
+# Interactive prompt to input student's name
+while True:
+    student_name = input("Enter student's name (type 'exit' to quit): ")
+    if student_name.lower() == 'exit':
+        break
+    else:
+        grades = get_student_grades(student_name)
+        print(f"Grades of {student_name}: {' '.join(grades) if isinstance(grades, list) else grades}")
