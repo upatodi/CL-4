@@ -1,0 +1,50 @@
+from collections import Counter
+import re
+
+class MRWordFrequency:
+
+    def mapper(self, line):
+        # Split the line into words
+        words = re.findall(r'\w+', line.lower())
+        # Check if the given word is in the line
+        for word in words:
+            yield word, 1
+
+    def reducer(self, word_counts):
+        # Sum up the counts for each word
+        word, counts = word_counts
+        total_count = sum(counts)
+        # Emit the word and its total count
+        return word, total_count
+
+def run_map_reduce(input_file, target_word):
+    # Initialize the MRWordFrequency class
+    mr = MRWordFrequency()
+    
+    # Read the input file
+    with open(input_file, 'r') as file:
+        lines = file.readlines()
+    
+    # Map phase
+    mapped_results = []
+    for line in lines:
+        mapped_results.extend(mr.mapper(line))
+    
+    # Shuffle and sort (not needed in this simplified example)
+    
+    # Reduce phase
+    word_counts = {}
+    for word, count in mapped_results:
+        if word == target_word:
+            if word in word_counts:
+                word_counts[word] += count
+            else:
+                word_counts[word] = count
+    
+    return word_counts.get(target_word, 0)
+
+# Example usage:
+input_file = 'input.txt'
+target_word = 'of'
+frequency = run_map_reduce(input_file, target_word)
+print(f"The frequency of '{target_word}' in '{input_file}' is: {frequency}")
